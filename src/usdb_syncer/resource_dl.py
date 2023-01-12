@@ -3,6 +3,7 @@
 import os
 from enum import Enum
 from typing import Union
+from urllib.parse import urlparse
 
 import requests
 import yt_dlp
@@ -50,6 +51,41 @@ def url_from_video_resouce(resource: str) -> str:
     return f"https://www.youtube.com/watch?v={resource}"
 
 
+def is_domain_allowed(test_domain: str) -> bool:
+    domain_white_list = [
+        f"{sub}{domain}"
+        for sub in ["", "www."]
+        for domain in [
+          # videos/audios
+          "youtube.com",
+          "youtu.be", 
+          "vimeo.com", 
+          "dailymotion.com", 
+          "universal-music.de", 
+          # covers/backgrounds
+          "images.fanart.tv", 
+          "fanart.tv"]
+    ]
+
+    return test_domain in domain_white_list
+
+
+def check_url(url: str, logger: Log) -> tuple[bool, str | None]:
+
+    domain = urlparse(url).netloc
+    if not is_domain_allowed(domain):
+        return False, domain
+
+    final_redirect_url = requests.get(url, timeout=1).url
+    final_redirect_domain = urlparse(final_redirect_url).netloc
+    if final_redirect_domain != domain:
+        logger.debug(f"{domain} finally redirects to {final_redirect_domain}")
+        if not is_domain_allowed(final_redirect_domain):
+            return False, final_redirect_domain
+
+    return True, None
+
+
 def download_video(
     resource: str,
     options: AudioOptions | VideoOptions,
@@ -69,6 +105,14 @@ def download_video(
         the extension of the successfully downloaded file or None
     """
     url = url_from_video_resouce(resource)
+    url_allowed, forbidden_domain = check_url(url, logger)
+    if not url_allowed:
+        logger.error(
+            f"Failed to download video "
+            f"(download from ressource domain '{forbidden_domain}' is restricted)"
+        )
+        return None
+
     ext = None
     ydl_opts: dict[str, Union[str, bool, tuple, list]] = {
         "format": options.ytdl_format(),
@@ -100,6 +144,14 @@ def download_video(
 
 
 def download_image(url: str, logger: Log) -> bytes | None:
+    url_allowed, forbidden_domain = check_url(url, logger)
+    if not url_allowed:
+        logger.error(
+            f"Failed to download image "
+            f"(download from ressource domain '{forbidden_domain}' is restricted)"
+        )
+        return None
+
     try:
         reply = requests.get(
             url, allow_redirects=True, headers=IMAGE_DOWNLOAD_HEADERS, timeout=60
@@ -136,7 +188,10 @@ def download_and_process_image(
     if not (url := _get_image_url(meta_tags, details, kind, logger)):
         return None
     if not (img_bytes := download_image(url, logger)):
-        logger.error(f"#{str(kind).upper()}: file does not exist at url: {url}")
+        logger.error(
+            f"#{str(kind).upper()}: "
+            f"file does not exist at or cannot be loaded from url: {url}"
+        )
         return None
     fname = f"{filename_stem} [{kind.value}].jpg"
     path = os.path.join(pathname, fname)
