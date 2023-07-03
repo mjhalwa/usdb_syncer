@@ -50,7 +50,7 @@ jobs:
       - name: Collect required platform plugins
         if: matrix.TARGET == 'Linux'
         run: |
-          apt install libxcb-cursor0
+          sudo apt install libxcb-cursor0
           echo "$QT_PLUGIN_PATH"
           mkdir platforms
           ls "$QT_PLUGIN_PATH"
