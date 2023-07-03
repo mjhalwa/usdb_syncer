@@ -14,7 +14,7 @@ jobs:
         include:
           - os: ubuntu-latest
             TARGET: Linux
-            PYINSTALLER_ARGS: "--onefile --add-data 'data/song_list.json:data'"
+            PYINSTALLER_ARGS: "--onefile --add-data 'data/song_list.json:data' --add-data './platforms:platforms'"
           - os: macos-latest
             TARGET: macOS
             PYINSTALLER_ARGS: "--windowed --icon src/usdb_syncer/gui/resources/appicon_128x128.png --add-data 'data/song_list.json:data'"
@@ -47,6 +47,12 @@ jobs:
         run: generate_pyside_files
       - name: Scrape USDB song list to ship with the bundle
         run: generate_song_list_json -t 'data/song_list.json' -u '${{ secrets.USDB_USER }}' -p '${{ secrets.USDB_PASSWORD }}'
+      - name: Collect required platform plugins
+        run: |
+          mkdir platforms
+          ls /usr/lib/x86_64-linux-gnu/qt6/plugins/platforms
+          cp /usr/lib/x86_64-linux-gnu/qt6/plugins/platforms/libqxcb.so ./platforms
+          ls ./platforms
       - name: Build with pyinstaller for ${{matrix.os}}
         run: pyinstaller -n 'USDB_Syncer-${{github.ref_name}}-${{matrix.TARGET}}' ${{matrix.PYINSTALLER_ARGS}} src/usdb_syncer/main.py
       - name: Create DMG
