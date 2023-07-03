@@ -53,7 +53,7 @@ jobs:
           mkdir platforms
           ls "$QT_PLUGIN_PATH"
           ls "${QT_PLUGIN_PATH}/platforms"
-          cp "${QT_PLUGIN_PATH}/platforms/libqxcb.so ./platforms
+          cp "${QT_PLUGIN_PATH}/platforms/libqxcb.so" ./platforms
           ls ./platforms
       - name: Build with pyinstaller for ${{matrix.os}}
         run: pyinstaller -n 'USDB_Syncer-${{github.ref_name}}-${{matrix.TARGET}}' ${{matrix.PYINSTALLER_ARGS}} src/usdb_syncer/main.py
