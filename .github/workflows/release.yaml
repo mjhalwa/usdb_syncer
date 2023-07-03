@@ -49,9 +49,11 @@ jobs:
         run: generate_song_list_json -t 'data/song_list.json' -u '${{ secrets.USDB_USER }}' -p '${{ secrets.USDB_PASSWORD }}'
       - name: Collect required platform plugins
         run: |
+          echo "$QT_QPA_PLATFORM_PLUGINS_PATH"
+
           mkdir platforms
-          ls /usr/lib/x86_64-linux-gnu/qt6/plugins/platforms
-          cp /usr/lib/x86_64-linux-gnu/qt6/plugins/platforms/libqxcb.so ./platforms
+          ls "$QT_QPA_PLATFORM_PLUGINS_PATH"
+          cp "${QT_QPA_PLATFORM_PLUGINS_PATH}/libqxcb.so ./platforms
           ls ./platforms
       - name: Build with pyinstaller for ${{matrix.os}}
         run: pyinstaller -n 'USDB_Syncer-${{github.ref_name}}-${{matrix.TARGET}}' ${{matrix.PYINSTALLER_ARGS}} src/usdb_syncer/main.py
