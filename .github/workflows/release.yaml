@@ -14,7 +14,8 @@ jobs:
         include:
           - os: ubuntu-latest
             TARGET: Linux
-            PYINSTALLER_ARGS: "--onefile --add-data 'data/song_list.json:data' --add-data './platforms:platforms'"
+            # PYINSTALLER_ARGS: "--onefile --add-data 'data/song_list.json:data' --add-data './platforms:platforms'"
+            PYINSTALLER_ARGS: "--onefile --add-data 'data/song_list.json:data'"
           - os: macos-latest
             TARGET: macOS
             PYINSTALLER_ARGS: "--windowed --icon src/usdb_syncer/gui/resources/appicon_128x128.png --add-data 'data/song_list.json:data'"
@@ -51,21 +52,21 @@ jobs:
         if: matrix.TARGET == 'Linux'
         run: |
           sudo apt install libxcb-cursor0
-          sudo apt install libxcb-xinerama0
-          sudo apt install -y \
-            libfontconfig1-dev libfreetype6-dev \
-            libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev \
-            libxi-dev libxrender-dev \
-            libxkbcommon-dev libxkbcommon-x11-dev libatspi2.0-dev \
-            libopengl0 '^libxcb.*-dev'
-          sudo apt install '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev
-          sudo apt install libwebp-dev libxau-dev
-          echo "$QT_PLUGIN_PATH"
-          mkdir platforms
-          ls "$QT_PLUGIN_PATH"
-          ls "${QT_PLUGIN_PATH}/platforms"
-          cp -r "${QT_PLUGIN_PATH}/platforms" .
-          ls ./platforms
+          # sudo apt install libxcb-xinerama0
+          # sudo apt install -y \
+          #   libfontconfig1-dev libfreetype6-dev \
+          #   libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev \
+          #   libxi-dev libxrender-dev \
+          #   libxkbcommon-dev libxkbcommon-x11-dev libatspi2.0-dev \
+          #   libopengl0 '^libxcb.*-dev'
+          # sudo apt install '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev
+          # sudo apt install libwebp-dev libxau-dev
+          # echo "$QT_PLUGIN_PATH"
+          # mkdir platforms
+          # ls "$QT_PLUGIN_PATH"
+          # ls "${QT_PLUGIN_PATH}/platforms"
+          # cp -r "${QT_PLUGIN_PATH}/platforms" .
+          # ls ./platforms
       - name: Build with pyinstaller for ${{matrix.os}}
         run: pyinstaller -n 'USDB_Syncer-${{github.ref_name}}-${{matrix.TARGET}}' ${{matrix.PYINSTALLER_ARGS}} src/usdb_syncer/main.py
       - name: Create DMG
