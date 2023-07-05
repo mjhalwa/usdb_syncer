@@ -60,7 +60,7 @@ jobs:
             libxkbcommon-dev libxkbcommon-x11-dev libatspi2.0-dev \
             libopengl0 '^libxcb.*-dev'
           sudo apt install '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev
-          # sudo apt install libwebp-dev libxau-dev
+          sudo apt install libwebp-dev libxau-dev
           # echo "$QT_PLUGIN_PATH"
           # mkdir platforms
           # ls "$QT_PLUGIN_PATH"
