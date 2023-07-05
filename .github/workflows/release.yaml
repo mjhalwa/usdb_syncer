@@ -51,6 +51,7 @@ jobs:
       - name: Collect required platform plugins
         if: matrix.TARGET == 'Linux'
         run: |
+          sudo apt update -y && sudo apt upgrade -y
           sudo apt install libxcb-cursor0
           sudo apt install libxcb-xinerama0
           sudo apt install -y \
