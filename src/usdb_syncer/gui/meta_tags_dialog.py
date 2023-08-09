@@ -2,7 +2,7 @@
 
 from typing import Callable
 
-from pyshorteners import Shortener
+from pyshorteners.shorteners import tinyurl
 from pyshorteners.exceptions import (
     BadAPIResponseException,
     BadURLException,
@@ -208,7 +208,7 @@ def _urls_and_setters(tags: MetaTags) -> list[tuple[str, Callable[[str], None]]]
 
 def _try_shorten_url(url: str) -> str:
     try:
-        short = Shortener().tinyurl.short(url).removeprefix("https://")
+        short = tinyurl.Shortener().short(url).removeprefix("https://")
     except (
         BadAPIResponseException,
         BadURLException,
